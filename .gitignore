@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+data/*.json
+data/*.csv
+reports/*.csv
+reports/*.parquet
+.DS_Store
+.vscode/
