@@ -5,5 +5,7 @@ data/*.json
 data/*.csv
 reports/*.csv
 reports/*.parquet
+models/*.joblib
+reports/*.parquet
 .DS_Store
 .vscode/
