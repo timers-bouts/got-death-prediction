@@ -98,13 +98,12 @@ def train_character_model(characters: pd.DataFrame,
     Train and evaluate 5 classifiers on character survival prediction.
     Saves the best model to model_dir/character_best.joblib.
 
-    Target column: 'survives' (1 = survived, 0 = died)
+    Target column: 'is_killed' (1 = character is killed, 0 = character is not killed)
     """
-    target = "survives"
+    target = "is_killed"
 
     # Drop name column — not a feature
-    # Also drop is_killed, as that's the same as "survives", our target
-    df = characters.drop(columns=["character_name", "is_killed"], errors="ignore")
+    df = characters.drop(columns=["character_name"], errors="ignore")
 
     X_train, X_val, X_test, y_train, y_val, y_test = split(df, target)
 
@@ -140,6 +139,12 @@ def train_character_model(characters: pd.DataFrame,
         except Exception as e:
             print(f"[character] {name} failed: {e}")
             results[name] = {"error": str(e)}
+    
+    # Always save Random Forest for feature importance visualization
+    rf = models["random_forest"]
+    if hasattr(rf, 'feature_importances_'):
+        save_model(rf, model_dir / "character_rf.joblib")
+
 
     if best_model is not None:
         save_model(best_model, model_dir / "character_best.joblib")
@@ -176,10 +181,10 @@ def train_scene_model(scenes: pd.DataFrame,
         ),
         "svc": Pipeline([
             ("scaler", StandardScaler()),
-            ("svc_clf", SVC(kernel="sigmoid", C=1, coef0=1, degree=3, random_state=42)),
+            ("svc_clf", SVC(kernel="sigmoid", C=1, coef0=1, degree=3, random_state=42, class_weight="balanced")),
         ]),
         "naive_bayes": make_pipeline(MultinomialNB()),
-        "logistic_regression": LogisticRegression(max_iter=1000, random_state=42),
+        "logistic_regression": LogisticRegression(max_iter=1000, random_state=42, class_weight="balanced"),
     }
 
     results = {}
@@ -188,7 +193,7 @@ def train_scene_model(scenes: pd.DataFrame,
     for name, model in models.items():
         try:
             model.fit(X_train, y_train)
-            val_f1 = metrics.f1_score(y_val, model.predict(X_val), average="weighted", zero_division=0)
+            val_f1 = metrics.f1_score(y_val, model.predict(X_val), average="macro", zero_division=0)
             results[name] = {"val_f1": val_f1, **evaluate(model, X_test, y_test)}
             print(f"[scene] {name}: val_f1={val_f1:.4f}  test={results[name]['accuracy']:.4f}")
 
@@ -199,6 +204,12 @@ def train_scene_model(scenes: pd.DataFrame,
         except Exception as e:
             print(f"[scene] {name} failed: {e}")
             results[name] = {"error": str(e)}
+    
+    # Always save Random Forest for feature importance visualization
+    rf = models["random_forest"]
+    if hasattr(rf, 'feature_importances_'):
+        save_model(rf, model_dir / "scene_rf.joblib")
+
 
     if best_model is not None:
         save_model(best_model, model_dir / "scene_best.joblib")
