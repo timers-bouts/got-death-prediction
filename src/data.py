@@ -215,7 +215,7 @@ def build_characters(characters_raw: list[dict[str, Any]] | dict[str, Any]) -> p
         "is_killed", "has_killed_others", "is_served", "has_served",
         "is_kingsguard", "is_guarded", "is_guardian", "not_human",
         "is_young_version", "has_children", "child_of_named_character",
-        "is_married", "died"
+        "is_married"
     ] if c in df.columns]
     df = df[possible_cols].copy()
 
@@ -223,12 +223,7 @@ def build_characters(characters_raw: list[dict[str, Any]] | dict[str, Any]) -> p
     df = df.rename(columns={
         "characterName": "character_name",
         "houseName": "house_name",
-        "is_killed": "survives"  # we'll invert below
     })
-
-    # Survives == 1 if NOT died (depends on your raw label—confirm your data!)
-    if "survives" in df.columns:
-        df["survives"] = df["survives"].apply(lambda x: 0 if bool(x) else 1)
 
     # Flatten house_name from list to single value before encoding
     if "house_name" in df.columns:
@@ -239,8 +234,6 @@ def build_characters(characters_raw: list[dict[str, Any]] | dict[str, Any]) -> p
     # One-hot house if present; convert booleans to int
     cat_cols = [c for c in ["house_name"] if c in df.columns]
     df = one_hot(df, cat_cols)
-    if "is_royal" in df.columns:
-        df["is_royal"] = df["is_royal"].astype(bool).astype(int)
 
     return df
 
