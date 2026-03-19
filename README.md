@@ -123,14 +123,14 @@ pip install -r requirements.txt
 
 # Download data (see Dataset section above) and place in data/
 
-# Build features
-python -m src.data --data_dir data --out_dir reports
+# Run the full pipeline
+make all
 
-# Train models
-python -m src.models --data_dir reports --out_dir reports --model_dir models
-
-# Generate visualizations
-python -m src.visualize --data_dir reports --model_dir models --out_dir reports/figures
+# Or run individual steps
+make data       # build features from raw JSON
+make models     # train and evaluate all models
+make visualize  # generate visualizations
+make clean      # remove all generated artifacts
 ```
 
 ---
