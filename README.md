@@ -2,6 +2,8 @@
 
 Predicting character survival and scene-level deaths using machine learning on the *Game of Thrones* dataset.
 
+**[Read the full writeup (PDF)](reports/writeup.pdf)** | [LaTeX source](reports/writeup.tex)
+
 ---
 
 ## Project Overview
@@ -143,7 +145,9 @@ got-death-prediction/
 ├── notebooks/              # Exploratory analysis
 ├── reports/
 │   ├── figures/            # Generated visualizations
-│   └── metrics.json        # Model evaluation results
+│   ├── metrics.json        # Model evaluation results
+│   ├── writeup.pdf         # Final writeup
+│   └── writeup.tex         # LaTeX source
 ├── models/                 # Saved model artifacts (not committed)
 ├── src/
 │   ├── data.py             # Data loading and feature engineering
